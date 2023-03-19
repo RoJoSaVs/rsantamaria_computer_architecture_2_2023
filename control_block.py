@@ -1,5 +1,10 @@
 from tkinter import *
 
+ownFont = ("Comic Sans MS", 12)
+bottonFont = ("Comic Sans MS", 10)
+backGroundColor = "#1a1a1a"
+consoleColor = "black"
+
 class ControlBlock():
 	def __init__(self, root):
 		# Control Variables
@@ -18,40 +23,40 @@ class ControlBlock():
 
 
 		# GUI stuff
-		self.controlLabel = Label(root, text = "Control")
+		self.controlLabel = Label(root, text = "Control", bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.controlLabel.grid(row = 0, column = 1)
 
-		self.executionModeLabel = Label(root, text = "Execution Mode")
+		self.executionModeLabel = Label(root, text = "Execution Mode", bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.executionModeLabel.grid(row = 1, column = 0)
 
-		self.continueRadiobutton = Radiobutton(root, text = "Continue", variable = self.ctrlModeVal, value = 1, command = self.selection)
+		self.continueRadiobutton = Radiobutton(root, text = "Continue", variable = self.ctrlModeVal, value = 1, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.continueRadiobutton.grid(row = 2, column = 0, sticky = W)
 
-		self.stepByStepRadiobutton = Radiobutton(root, text = "Step by Step", variable = self.ctrlModeVal, value = 2, command = self.selection)
+		self.stepByStepRadiobutton = Radiobutton(root, text = "Step by Step", variable = self.ctrlModeVal, value = 2, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.stepByStepRadiobutton.grid(row = 3, column = 0, sticky = W)
-		self.nextStepButton = Button(root, text = "Next Step", command = self.nextStep, state = "disable")
-		self.nextStepButton.grid(row = 3 , column = 3)
+		self.nextStepButton = Button(root, text = "Next Step", command = self.nextStep, state = "disable", bg = backGroundColor, font = bottonFont, fg = "#03b6fc")
+		self.nextStepButton.grid(row = 3 , column = 1)
 
 		# User input instruction
-		self.userInstructionRadiobutton = Radiobutton(root, text = "User Instruction", variable = self.ctrlModeVal, value = 3, command = self.selection)
+		self.userInstructionRadiobutton = Radiobutton(root, text = "User Instruction", variable = self.ctrlModeVal, value = 3, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.userInstructionRadiobutton.grid(row = 4, column = 0, sticky = W)
 
 		self.cpuNumberButton = OptionMenu(root, self.cpuNumber, *self.processorNumber)
-		self.cpuNumberButton.config(state = "disable")
-		self.cpuNumberButton.grid(row = 4, column = 3)
+		self.cpuNumberButton.config(state = "disable", bg = backGroundColor, font = bottonFont, fg = "#03b6fc")
+		self.cpuNumberButton.grid(row = 4, column = 1)
 
 		self.instructionMenuButton = OptionMenu(root, self.instructionType, *self.instructionMenu)
-		self.instructionMenuButton.config(state = "disable")
-		self.instructionMenuButton.grid(row = 4, column = 4)
+		self.instructionMenuButton.config(state = "disable", bg = backGroundColor, font = bottonFont, fg = "#03b6fc")
+		self.instructionMenuButton.grid(row = 4, column = 3)
 
-		self.memAddressEntry = Entry(root, state = "disable")
-		self.memAddressEntry.grid(row = 4, column = 5, columnspan = 1)
+		self.memAddressEntry = Entry(root, state = "disable", bg = consoleColor, font = bottonFont, fg = "#05fa42")
+		self.memAddressEntry.grid(row = 4, column = 4)
 
-		self.constValEntry = Entry(root, state = "disable")
-		self.constValEntry.grid(row = 4, column = 6, columnspan = 1)
+		self.constValEntry = Entry(root, state = "disable", bg = consoleColor, font = bottonFont, fg = "#05fa42")
+		self.constValEntry.grid(row = 4, column = 5)
 
-		self.sendInstructionButton = Button(root, text = "Send", command = self.sendInstruction, state = "disable")
-		self.sendInstructionButton.grid(row = 4 , column = 7)
+		self.sendInstructionButton = Button(root, text = "Send", command = self.sendInstruction, state = "disable", bg = backGroundColor, font = bottonFont, fg = "#03b6fc")
+		self.sendInstructionButton.grid(row = 4 , column = 6)
 
 		
 
