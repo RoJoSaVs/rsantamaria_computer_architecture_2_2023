@@ -1,6 +1,6 @@
 from tkinter import *
 
-class ControlMode():
+class ControlBlock():
 	def __init__(self, root):
 		# Control Variables
 		self.ctrlModeVal = IntVar()
