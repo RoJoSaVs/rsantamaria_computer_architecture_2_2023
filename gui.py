@@ -47,6 +47,8 @@ layout = LayoutDistribution(root)
 ctrl = ControlBlock(layout.controlFrame)
 instr = InstructionsBlock(layout.instructionFrame)
 cache = CacheBlock(layout.cacheFrame)
+cache.startCache()
 memory = MemoryBlock(layout.memoryFrame)
+memory.startMemory()
 
 root.mainloop()
