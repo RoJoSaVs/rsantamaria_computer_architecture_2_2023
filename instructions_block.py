@@ -39,20 +39,20 @@ class InstructionsBlock():
 	def updateInstructionBlock(self, cpuId, instruction):
 		if(cpuId == 0):
 			self.instProc0.config(state = NORMAL)
-			self.instProc0.insert(END, instruction)
+			self.instProc0.insert("1.0", instruction + '\n')
 			self.instProc0.config(state = DISABLED)
 
 		elif(cpuId == 1):
 			self.instProc1.config(state = NORMAL)
-			self.instProc1.insert(END, instruction)
+			self.instProc1.insert("1.0", instruction + '\n')
 			self.instProc1.config(state = DISABLED)
 
 		elif(cpuId == 2):
 			self.instProc2.config(state = NORMAL)
-			self.instProc2.insert(END, instruction)
+			self.instProc2.insert("1.0", instruction + '\n')
 			self.instProc2.config(state = DISABLED)
 
 		elif(cpuId == 3):
 			self.instProc3.config(state = NORMAL)
-			self.instProc3.insert(END, instruction)
+			self.instProc3.insert("1.0", instruction + '\n')
 			self.instProc3.config(state = DISABLED)

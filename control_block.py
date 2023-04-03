@@ -1,4 +1,7 @@
 from tkinter import *
+import threading
+import time
+
 
 ownFont = ("Comic Sans MS", 12)
 bottonFont = ("Comic Sans MS", 10)
@@ -6,7 +9,14 @@ backGroundColor = "#1a1a1a"
 consoleColor = "black"
 
 class ControlBlock():
-	def __init__(self, root):
+	def __init__(self, root, cpu0, cpu1, cpu2, cpu3):
+		self.cpu0 = cpu0
+		self.cpu1 = cpu1
+		self.cpu2 = cpu2
+		self.cpu3 = cpu3
+		self.running = True
+		# self.running = threading.Event()
+
 		# Control Variables
 		self.ctrlModeVal = IntVar()
 		self.instructionType = StringVar()
@@ -29,8 +39,9 @@ class ControlBlock():
 		self.executionModeLabel = Label(root, text = "Execution Mode", bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.executionModeLabel.grid(row = 1, column = 0)
 
-		self.continueRadiobutton = Radiobutton(root, text = "Continue", variable = self.ctrlModeVal, value = 1, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
-		self.continueRadiobutton.grid(row = 2, column = 0, sticky = W)
+		# Continue Exec needs thread implementation
+		# self.continueRadiobutton = Radiobutton(root, text = "Continue", variable = self.ctrlModeVal, value = 1, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
+		# self.continueRadiobutton.grid(row = 2, column = 0, sticky = W)
 
 		self.stepByStepRadiobutton = Radiobutton(root, text = "Step by Step", variable = self.ctrlModeVal, value = 2, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.stepByStepRadiobutton.grid(row = 3, column = 0, sticky = W)
@@ -62,11 +73,13 @@ class ControlBlock():
 
 	def selection(self):
 		if(int(self.ctrlModeVal.get()) == 2):
-			self.setEnable()
+			self.setDisable()
 			self.nextStepButton["state"] = "active"
 
 		elif(int(self.ctrlModeVal.get()) == 3):
-			self.setEnable()
+			# self.continueExec = False
+
+			self.setDisable()
 			self.cpuNumberButton["state"] = "active"
 			self.instructionMenuButton["state"] = "active"
 			self.memAddressEntry["state"] = "normal"
@@ -74,10 +87,12 @@ class ControlBlock():
 			self.sendInstructionButton["state"] = "active"
 
 		else:
-			self.setEnable()
+			self.setDisable()
+			threading.Thread(target = self.continuousExecution(True)).start()
 
 
-	def setEnable(self):
+	def setDisable(self):
+		# self.running = False
 		self.nextStepButton["state"] = "disable"
 		self.cpuNumberButton["state"] = "disable"
 		self.instructionMenuButton["state"] = "disable"
@@ -86,9 +101,33 @@ class ControlBlock():
 		self.constValEntry["state"] = "disable"
 
 
+	def continuousExecution(self, running):
+		# print(self.running)
+		while self.running:
+			if(running):
+				threading.Thread(target = self.cpu0.randomInstruction()).start()
+				threading.Thread(target = self.cpu1.randomInstruction()).start()
+				threading.Thread(target = self.cpu2.randomInstruction()).start()
+				threading.Thread(target = self.cpu3.randomInstruction()).start()
+				running = False
+			else:
+				running = True
+			# print("2")
+			# self.cpu0.randomInstruction()
+			# self.cpu1.randomInstruction()
+			# self.cpu2.randomInstruction()
+			# self.cpu3.randomInstruction()
+			time.sleep(1)
+			# threading.Thread(target = self.cpu0.randomInstruction(), args=(1,)).start()
+
+
 
 	def nextStep(self):
-		print("Next Step")
+		threading.Thread(target = self.cpu0.randomInstruction()).start()
+		threading.Thread(target = self.cpu1.randomInstruction()).start()
+		threading.Thread(target = self.cpu2.randomInstruction()).start()
+		threading.Thread(target = self.cpu3.randomInstruction()).start()
+		# print("Next Step")
 
 
 	def sendInstruction(self):
