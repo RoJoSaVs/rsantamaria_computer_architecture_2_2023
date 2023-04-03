@@ -1,7 +1,13 @@
+import threading
+
 from control_block import *
 from cache_block import *
 from instructions_block import *
 from memory_block import *
+
+from cpu import *
+
+
 
 backGroundColor = "#1a1a1a"
 
@@ -11,8 +17,6 @@ root.resizable(False, False)
 root.title("Computer Architecture 2 - 2018109283")
 root.configure(bg = backGroundColor)
 
-# width = root.winfo_screenwidth()
-# height = root.winfo_screenheight()
 
 
 class LayoutDistribution():
@@ -44,9 +48,26 @@ class LayoutDistribution():
 
 
 layout = LayoutDistribution(root)
-ctrl = ControlBlock(layout.controlFrame)
+
+
 instr = InstructionsBlock(layout.instructionFrame)
+
 cache = CacheBlock(layout.cacheFrame)
+cache.startCache()
+
 memory = MemoryBlock(layout.memoryFrame)
+memory.startMemory()
+
+
+################ GUI LOGIC ################
+cpu0 = CPU(instr, 0, cache, 0, memory, True)
+cpu1 = CPU(instr, 1, cache, 1, memory, True)
+cpu2 = CPU(instr, 2, cache, 2, memory, True)
+cpu3 = CPU(instr, 3, cache, 3, memory, True)
+# cpu0_thread = threading.Thread(target = cpu0.randomInstruction(), args=(1,))
+# cpu0_thread.start()
+
+
+ctrl = ControlBlock(layout.controlFrame, cpu0, cpu1, cpu2, cpu3)
 
 root.mainloop()
