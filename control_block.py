@@ -105,10 +105,24 @@ class ControlBlock():
 		# print(self.running)
 		while self.running:
 			if(running):
-				threading.Thread(target = self.cpu0.randomInstruction()).start()
-				threading.Thread(target = self.cpu1.randomInstruction()).start()
-				threading.Thread(target = self.cpu2.randomInstruction()).start()
-				threading.Thread(target = self.cpu3.randomInstruction()).start()
+				# self.cpu0.randomInstruction()
+				# self.cpu1.randomInstruction()
+				# self.cpu2.randomInstruction()
+				# self.cpu3.randomInstruction()
+				p0 = threading.Thread(target = self.cpu0.randomInstruction())
+				p1 = threading.Thread(target = self.cpu1.randomInstruction())
+				p2 = threading.Thread(target = self.cpu2.randomInstruction())
+				p3 = threading.Thread(target = self.cpu3.randomInstruction())
+
+				p0.start()
+				p1.start()
+				p2.start()
+				p3.start()
+
+				p0.join()
+				p1.join()
+				p2.join()
+				p3.join()
 				running = False
 			else:
 				running = True
