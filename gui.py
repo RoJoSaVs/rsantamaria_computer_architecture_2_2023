@@ -60,16 +60,6 @@ memory.startMemory()
 
 
 ################ GUI LOGIC ################
-# cacheMatrix = [[cache.p0B0, cache.p0B1, cache.p0B2, cache.p0B3],
-# 			   [cache.p1B0, cache.p1B1, cache.p1B2, cache.p1B3],
-# 			   [cache.p2B0, cache.p2B1, cache.p2B2, cache.p2B3],
-# 			   [cache.p3B0, cache.p3B1, cache.p3B2, cache.p3B3]]
-
-# cpu0 = CPU(instr, 0, cacheMatrix[0], 0, memory, True)
-# cpu1 = CPU(instr, 1, cacheMatrix[1], 1, memory, True)
-# cpu2 = CPU(instr, 2, cacheMatrix[2], 2, memory, True)
-# cpu3 = CPU(instr, 3, cacheMatrix[3], 3, memory, True)
-
 cpu0 = CPU(instr, 0, cache, 0, memory, True)
 cpu1 = CPU(instr, 1, cache, 1, memory, True)
 cpu2 = CPU(instr, 2, cache, 2, memory, True)

@@ -42,8 +42,8 @@ class ControlBlock():
 		self.executionModeLabel.grid(row = 1, column = 0)
 
 		# Continue Exec needs thread implementation
-		# self.continueRadiobutton = Radiobutton(root, text = "Continue", variable = self.ctrlModeVal, value = 1, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
-		# self.continueRadiobutton.grid(row = 2, column = 0, sticky = W)
+		self.continueRadiobutton = Radiobutton(root, text = "Continue", variable = self.ctrlModeVal, value = 1, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
+		self.continueRadiobutton.grid(row = 2, column = 0, sticky = W)
 
 		self.stepByStepRadiobutton = Radiobutton(root, text = "Step by Step", variable = self.ctrlModeVal, value = 2, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.stepByStepRadiobutton.grid(row = 3, column = 0, sticky = W)
@@ -75,10 +75,12 @@ class ControlBlock():
 
 	def selection(self):
 		if(int(self.ctrlModeVal.get()) == 2):
+			self.running = False
 			self.setDisable()
 			self.nextStepButton["state"] = "active"
 
 		elif(int(self.ctrlModeVal.get()) == 3):
+			self.running = False
 			self.setDisable()
 			self.cpuNumberButton["state"] = "active"
 			self.instructionMenuButton["state"] = "active"
@@ -88,7 +90,9 @@ class ControlBlock():
 
 		else:
 			self.setDisable()
-			threading.Thread(target = self.continuousExecution(True)).start()
+			self.running = True
+			continuous = threading.Thread(target = self.continuousExecution).start()
+			# continuous.join()
 
 
 	def setDisable(self):
@@ -100,27 +104,27 @@ class ControlBlock():
 		self.constValEntry["state"] = "disable"
 
 
-	def continuousExecution(self, running):
-		while self.running:
-			if(running):
-				p0 = threading.Thread(target = self.cpu0.randomInstruction())
-				p1 = threading.Thread(target = self.cpu1.randomInstruction())
-				p2 = threading.Thread(target = self.cpu2.randomInstruction())
-				p3 = threading.Thread(target = self.cpu3.randomInstruction())
+	def continuousExecution(self):
+		while True:
+			p0 = threading.Thread(target = self.cpu0.randomInstruction)
+			p1 = threading.Thread(target = self.cpu1.randomInstruction)
+			p2 = threading.Thread(target = self.cpu2.randomInstruction)
+			p3 = threading.Thread(target = self.cpu3.randomInstruction)
 
-				p0.start()
-				p1.start()
-				p2.start()
-				p3.start()
+			p0.start()
+			p1.start()
+			p2.start()
+			p3.start()
 
-				p0.join()
-				p1.join()
-				p2.join()
-				p3.join()
-				running = False
-			else:
-				running = True
-			time.sleep(1)
+			if(not(self.running)):
+				break
+
+
+			p0.join()
+			p1.join()
+			p2.join()
+			p3.join()
+			time.sleep(3)
 
 
 
