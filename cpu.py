@@ -1,6 +1,6 @@
 from tkinter import *
 import time
-# import threading
+import random
 
 import probabilityFunction as pf
 from cache_control import *
@@ -12,7 +12,7 @@ class CPU():
 	def __init__(self, cpuBlock, cpuId, cacheBlock, cacheId, ram, running):
 		self.cpuBlock = cpuBlock
 		self.cpuId = cpuId
-		self.cacheBlock = cacheBlock # 4 caches of gui
+		self.cacheBlock = cacheBlock
 		self.cacheId = cacheId
 		self.ram = ram
 		self.running = running
@@ -139,19 +139,18 @@ class CPU():
 
 
 	def randomInstruction(self): # CALC - READ - WRITE
-		# while(True):
 		instructionString = ""
-		instructionType = pf.lsfr(3)
-		# instructionType = pf.lsfr(2)
+		instructionType = pf.randomNumber(100)
 
-		if(instructionType == 0): # WRITE
+		# Discrete Uniform Distribution
+		if(instructionType < 33): # WRITE
 			memAddress = self.randomAddress()
 			hexValue = self.randomValue()
 			instructionString = "WRITE " + (bin(memAddress)[2::]).zfill(3) + " " + hexValue
 			self.MOESI("WRITE", memAddress, hexValue)
 
 
-		elif(instructionType == 1): # READ
+		elif(instructionType < 66): # READ
 			memAddress = self.randomAddress()
 			instructionString = "READ " + (bin(memAddress)[2::]).zfill(3)
 			self.MOESI("READ", memAddress, "0000")
@@ -163,10 +162,10 @@ class CPU():
 
 
 	def randomAddress(self): #0 - 7
-		addressValue = pf.lsfr(8)
-		return addressValue
+		addressValue = pf.randomNumber(80) # Discrete Uniform Distribution with mod
+		return addressValue % 8
 
 
 	def randomValue(self): #0 - 65535
-		value = pf.lsfr(65536)
+		value = int(random.uniform(0, 65535))
 		return hex(value)[2::].zfill(4)
