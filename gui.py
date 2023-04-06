@@ -64,8 +64,6 @@ cpu0 = CPU(instr, 0, cache, 0, memory, True)
 cpu1 = CPU(instr, 1, cache, 1, memory, True)
 cpu2 = CPU(instr, 2, cache, 2, memory, True)
 cpu3 = CPU(instr, 3, cache, 3, memory, True)
-# cpu0_thread = threading.Thread(target = cpu0.randomInstruction(), args=(1,))
-# cpu0_thread.start()
 
 
 ctrl = ControlBlock(layout.controlFrame, cpu0, cpu1, cpu2, cpu3)

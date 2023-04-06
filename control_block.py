@@ -1,4 +1,6 @@
 from tkinter import *
+from tkinter import messagebox
+
 import threading
 import time
 
@@ -40,8 +42,8 @@ class ControlBlock():
 		self.executionModeLabel.grid(row = 1, column = 0)
 
 		# Continue Exec needs thread implementation
-		# self.continueRadiobutton = Radiobutton(root, text = "Continue", variable = self.ctrlModeVal, value = 1, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
-		# self.continueRadiobutton.grid(row = 2, column = 0, sticky = W)
+		self.continueRadiobutton = Radiobutton(root, text = "Continue", variable = self.ctrlModeVal, value = 1, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
+		self.continueRadiobutton.grid(row = 2, column = 0, sticky = W)
 
 		self.stepByStepRadiobutton = Radiobutton(root, text = "Step by Step", variable = self.ctrlModeVal, value = 2, command = self.selection, bg = backGroundColor, font = ownFont, fg = "#03b6fc")
 		self.stepByStepRadiobutton.grid(row = 3, column = 0, sticky = W)
@@ -73,12 +75,12 @@ class ControlBlock():
 
 	def selection(self):
 		if(int(self.ctrlModeVal.get()) == 2):
+			self.running = False
 			self.setDisable()
 			self.nextStepButton["state"] = "active"
 
 		elif(int(self.ctrlModeVal.get()) == 3):
-			# self.continueExec = False
-
+			self.running = False
 			self.setDisable()
 			self.cpuNumberButton["state"] = "active"
 			self.instructionMenuButton["state"] = "active"
@@ -88,11 +90,12 @@ class ControlBlock():
 
 		else:
 			self.setDisable()
-			threading.Thread(target = self.continuousExecution(True)).start()
+			self.running = True
+			continuous = threading.Thread(target = self.continuousExecution).start()
+			# continuous.join()
 
 
 	def setDisable(self):
-		# self.running = False
 		self.nextStepButton["state"] = "disable"
 		self.cpuNumberButton["state"] = "disable"
 		self.instructionMenuButton["state"] = "disable"
@@ -101,24 +104,27 @@ class ControlBlock():
 		self.constValEntry["state"] = "disable"
 
 
-	def continuousExecution(self, running):
-		# print(self.running)
-		while self.running:
-			if(running):
-				threading.Thread(target = self.cpu0.randomInstruction()).start()
-				threading.Thread(target = self.cpu1.randomInstruction()).start()
-				threading.Thread(target = self.cpu2.randomInstruction()).start()
-				threading.Thread(target = self.cpu3.randomInstruction()).start()
-				running = False
-			else:
-				running = True
-			# print("2")
-			# self.cpu0.randomInstruction()
-			# self.cpu1.randomInstruction()
-			# self.cpu2.randomInstruction()
-			# self.cpu3.randomInstruction()
-			time.sleep(1)
-			# threading.Thread(target = self.cpu0.randomInstruction(), args=(1,)).start()
+	def continuousExecution(self):
+		while True:
+			p0 = threading.Thread(target = self.cpu0.randomInstruction)
+			p1 = threading.Thread(target = self.cpu1.randomInstruction)
+			p2 = threading.Thread(target = self.cpu2.randomInstruction)
+			p3 = threading.Thread(target = self.cpu3.randomInstruction)
+
+			p0.start()
+			p1.start()
+			p2.start()
+			p3.start()
+
+			if(not(self.running)):
+				break
+
+
+			p0.join()
+			p1.join()
+			p2.join()
+			p3.join()
+			time.sleep(3)
 
 
 
@@ -127,8 +133,85 @@ class ControlBlock():
 		threading.Thread(target = self.cpu1.randomInstruction()).start()
 		threading.Thread(target = self.cpu2.randomInstruction()).start()
 		threading.Thread(target = self.cpu3.randomInstruction()).start()
-		# print("Next Step")
 
 
 	def sendInstruction(self):
-		print(self.cpuNumber.get() + self.instructionType.get() + self.memAddressEntry.get() + self.constValEntry.get())
+		cpu = self.cpuNumber.get() 
+		instruction = self.instructionType.get()
+		address = self.memAddressEntry.get()
+		value = self.constValEntry.get()
+		
+		if(instruction == "CALC"):
+			if(self.cpuNumber.get() == "P1"):
+				self.cpu0.cpuBlock.updateInstructionBlock(self.cpu0.cpuId, instruction)
+				self.cpu1.randomInstruction()
+				self.cpu2.randomInstruction()
+				self.cpu3.randomInstruction()
+
+			elif(self.cpuNumber.get() == "P2"):
+				self.cpu1.cpuBlock.updateInstructionBlock(self.cpu1.cpuId, instruction)
+				self.cpu0.randomInstruction()
+				self.cpu2.randomInstruction()
+				self.cpu3.randomInstruction()
+
+			elif(self.cpuNumber.get() == "P3"):
+				self.cpu2.cpuBlock.updateInstructionBlock(self.cpu2.cpuId, instruction)
+				self.cpu0.randomInstruction()
+				self.cpu1.randomInstruction()
+				self.cpu3.randomInstruction()
+
+
+			else:
+				self.cpu3.cpuBlock.updateInstructionBlock(self.cpu3.cpuId, instruction)
+				self.cpu0.randomInstruction()
+				self.cpu1.randomInstruction()
+				self.cpu2.randomInstruction()
+		else:
+			try:
+				if(len(address) <= 3 ):
+					address = int(address, 2)
+					instructionString = instruction + " " + (bin(address)[2::]).zfill(3)
+					if((instruction == "WRITE") and (len(value) <= 4)):
+						value = int(value, 16)
+						value = hex(value)[2::].zfill(4)
+						instructionString = instructionString + " " + value
+					else:
+						value = 0
+						value = hex(value)[2::].zfill(4)
+					
+					if(self.cpuNumber.get() == "P1"):
+						self.cpu0.MOESI(instruction, address, value)
+						self.cpu0.cpuBlock.updateInstructionBlock(self.cpu0.cpuId, instructionString)
+
+						self.cpu1.randomInstruction()
+						self.cpu2.randomInstruction()
+						self.cpu3.randomInstruction()
+					
+					elif(self.cpuNumber.get() == "P2"):
+						self.cpu1.MOESI(instruction, address, value)
+						self.cpu1.cpuBlock.updateInstructionBlock(self.cpu1.cpuId, instructionString)
+
+						self.cpu0.randomInstruction()
+						self.cpu2.randomInstruction()
+						self.cpu3.randomInstruction()
+
+					elif(self.cpuNumber.get() == "P3"):
+						self.cpu2.MOESI(instruction, address, value)
+						self.cpu2.cpuBlock.updateInstructionBlock(self.cpu2.cpuId, instructionString)
+
+						self.cpu0.randomInstruction()
+						self.cpu1.randomInstruction()
+						self.cpu3.randomInstruction()
+					
+					else:
+						self.cpu3.MOESI(instruction, address, value)
+						self.cpu3.cpuBlock.updateInstructionBlock(self.cpu3.cpuId, instructionString)
+
+						self.cpu0.randomInstruction()
+						self.cpu1.randomInstruction()
+						self.cpu2.randomInstruction()
+
+			except:
+				messagebox.showerror("Wrong value input", "Invalid values for input: \n - Address: (000 - 111) \n - Value: (0000 - ffff)")
+
+			

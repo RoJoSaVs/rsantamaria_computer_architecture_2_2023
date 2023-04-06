@@ -3,6 +3,8 @@ import time
 # import threading
 
 import probabilityFunction as pf
+from cache_control import *
+from constants import *
 
 
 
@@ -10,87 +12,154 @@ class CPU():
 	def __init__(self, cpuBlock, cpuId, cacheBlock, cacheId, ram, running):
 		self.cpuBlock = cpuBlock
 		self.cpuId = cpuId
-		self.cacheBlock = cacheBlock
+		self.cacheBlock = cacheBlock # 4 caches of gui
 		self.cacheId = cacheId
 		self.ram = ram
 		self.running = running
 
-		self.lastCache0 = 0
-		self.lastCache1 = 0
+		self.lastCache = [1, 1]
+
+
+	def MOESI(self, instruction, memAddress, value):
+		listCachesWithAddress = self.getCacheWithAddress(memAddress)
+		if(instruction == "READ"):
+			if(listCachesWithAddress == []):
+				self.updateCacheStatus(memAddress, "E", ramModelVector[memAddress])
+				self.cacheBlock.updateCacheGui()
+
+			else:
+				for cache in listCachesWithAddress:
+					# https://developer.arm.com/documentation/den0013/d/Multi-core-processors/Cache-coherency/MESI-and-MOESI-protocols
+					if(cache.getStatus() == "M"): # Cache => O  Cache' => S
+						ramModelVector[int('0b' + cache.getAddress(), 2)] = cache.getValue() # Write to RAM
+						self.ram.updateRamValue()
+						cache.setStatus("O")
+						self.updateCacheStatus(memAddress, "S", cache.getValue())
+
+
+					elif(cache.getStatus() == "O"):
+						self.updateCacheStatus(memAddress, "S", cache.getValue())
+
+					elif(cache.getStatus() == "E"):
+						cache.setStatus("S")
+						self.updateCacheStatus(memAddress, "S", cache.getValue())
+
+
+					elif(cache.getStatus() == "S"):
+						cache.setStatus("S")
+						self.updateCacheStatus(memAddress, "S", cache.getValue())
+
+					elif(cache.getStatus() == "I"):
+						self.updateCacheStatus(memAddress, "E", ramModelVector[memAddress]) # Read from RAM
+
+		elif(instruction == "WRITE"):
+			writeOnCache = False
+			for cache in listCachesWithAddress:
+				if(cache.getStatus() == "O"):
+					writeOnCache = True
+
+			if(writeOnCache):
+				pass
+
+			else:
+				self.updateCacheStatus(memAddress, "M", value)
+				for cache in listCachesWithAddress:
+					cache.setStatus("I")
+
+			self.cacheBlock.updateCacheGui()
 
 
 
-	def setRamValue(self, value, memAddress):
-		if(memAddress == 0):
-			self.ram.memAddress000.config(state = NORMAL)
-			self.ram.memAddress000.delete("1.0", END)
-			self.ram.memAddress000.insert(END, value)
-			self.ram.memAddress000.config(state = DISABLED)
 
-		elif(memAddress == 1):
-			self.ram.memAddress001.config(state = NORMAL)
-			self.ram.memAddress001.delete("1.0", END)
-			self.ram.memAddress001.insert(END, value)
-			self.ram.memAddress001.config(state = DISABLED)
 
-		elif(memAddress == 2):
-			self.ram.memAddress010.config(state = NORMAL)
-			self.ram.memAddress010.delete("1.0", END)
-			self.ram.memAddress010.insert(END, value)
-			self.ram.memAddress010.config(state = DISABLED)
 
-		elif(memAddress == 3):
-			self.ram.memAddress011.config(state = NORMAL)
-			self.ram.memAddress011.delete("1.0", END)
-			self.ram.memAddress011.insert(END, value)
-			self.ram.memAddress011.config(state = DISABLED)
+	def updateCacheStatus(self, address, status, value): # BUS
+		existingCache = self.getCacheWithAddressLocalCPU(address)
+		if (address % 2 == 0):
+			if(existingCache == None):
+				pass
+			else:
+				if(self.lastCache[0] == 1):
+					self.lastCache[0] = 0
+				else:
+					self.lastCache[0] = 1
 
-		elif(memAddress == 4):
-			self.ram.memAddress100.config(state = NORMAL)
-			self.ram.memAddress100.delete("1.0", END)
-			self.ram.memAddress100.insert(END, value)
-			self.ram.memAddress100.config(state = DISABLED)
-			
-		elif(memAddress == 5):
-			self.ram.memAddress101.config(state = NORMAL)
-			self.ram.memAddress101.delete("1.0", END)
-			self.ram.memAddress101.insert(END, value)
-			self.ram.memAddress101.config(state = DISABLED)
-			
-		elif(memAddress == 6):
-			self.ram.memAddress110.config(state = NORMAL)
-			self.ram.memAddress110.delete("1.0", END)
-			self.ram.memAddress110.insert(END, value)
-			self.ram.memAddress110.config(state = DISABLED)
-			
-		elif(memAddress == 7):
-			self.ram.memAddress111.config(state = NORMAL)
-			self.ram.memAddress111.delete("1.0", END)
-			self.ram.memAddress111.insert(END, value)
-			self.ram.memAddress111.config(state = DISABLED)
-			
+			if(self.lastCache[0] == 1): # Modify set 0 0
+				cacheModelMatrix[self.cpuId][0].setValue(value)
+				cacheModelMatrix[self.cpuId][0].setStatus(status)
+				cacheModelMatrix[self.cpuId][0].setAddress((bin(address)[2::]).zfill(3))
+				self.cacheBlock.updateCacheGui()
+				self.lastCache[0] = 0
+
+			else: # Modify set 0 1
+				cacheModelMatrix[self.cpuId][1].setValue(value)
+				cacheModelMatrix[self.cpuId][1].setStatus(status)
+				cacheModelMatrix[self.cpuId][1].setAddress((bin(address)[2::]).zfill(3))
+				self.cacheBlock.updateCacheGui()
+				self.lastCache[0] = 1
+
+		else:
+			if(existingCache == None):
+				pass
+			else:
+				if(self.lastCache[1] == 1):
+					self.lastCache[1] = 0
+				else:
+					self.lastCache[1] = 1
+
+			if(self.lastCache[1] == 1): # Modify set 1 0
+				cacheModelMatrix[self.cpuId][2].setValue(value)
+				cacheModelMatrix[self.cpuId][2].setStatus(status)
+				cacheModelMatrix[self.cpuId][2].setAddress((bin(address)[2::]).zfill(3))
+				self.cacheBlock.updateCacheGui()
+				self.lastCache[1] = 0
+
+			else: # Modify set 1 1
+				cacheModelMatrix[self.cpuId][3].setValue(value)
+				cacheModelMatrix[self.cpuId][3].setStatus(status)
+				cacheModelMatrix[self.cpuId][3].setAddress((bin(address)[2::]).zfill(3))
+				self.cacheBlock.updateCacheGui()
+				self.lastCache[1] = 1
+
+
+	def getCacheWithAddress(self, memAddress):
+		listOfCache = []
+		for row in range(0, len(cacheModelMatrix)):
+			if(row != self.cpuId):
+				for column in range(0, len(cacheModelMatrix[row])):
+					if(cacheModelMatrix[row][column].getAddress() == (bin(memAddress)[2::]).zfill(3)):
+						listOfCache.append(cacheModelMatrix[row][column])
+		return listOfCache
+
+	def getCacheWithAddressLocalCPU(self, memAddress):
+		for cache in cacheModelMatrix[self.cpuId]:
+			if(cache.getAddress() == (bin(memAddress)[2::]).zfill(3)):
+				return cache
+		return None
 
 
 	def randomInstruction(self): # CALC - READ - WRITE
 		# while(True):
 		instructionString = ""
-		instructionType = pf.lsfr(4)
+		instructionType = pf.lsfr(3)
+		# instructionType = pf.lsfr(2)
+
 		if(instructionType == 0): # WRITE
-			addressValue = self.randomAddress()
+			memAddress = self.randomAddress()
 			hexValue = self.randomValue()
-			instructionString = "WRITE " + (bin(addressValue)[2::]).zfill(3) + " " + hexValue
-			self.setRamValue(hexValue, addressValue)
+			instructionString = "WRITE " + (bin(memAddress)[2::]).zfill(3) + " " + hexValue
+			self.MOESI("WRITE", memAddress, hexValue)
+
 
 		elif(instructionType == 1): # READ
 			memAddress = self.randomAddress()
 			instructionString = "READ " + (bin(memAddress)[2::]).zfill(3)
+			self.MOESI("READ", memAddress, "0000")
 
 		else: # CALC
 			instructionString = "CALC"
 
-		# threading.Tread(target = self.cpuBlock.updateInstructionBlock(self.cpuId, instructionString)).start()
 		self.cpuBlock.updateInstructionBlock(self.cpuId, instructionString)
-
 
 
 	def randomAddress(self): #0 - 7

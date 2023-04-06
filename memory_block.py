@@ -1,4 +1,5 @@
 from tkinter import *
+from constants import *
 
 ownFont = ("Comic Sans MS", 12)
 entryFont = ("Comic Sans MS", 10)
@@ -86,4 +87,104 @@ class MemoryBlock():
 
 		self.memAddress111.config(state = NORMAL)
 		self.memAddress111.insert(END, "0000")
+		self.memAddress111.config(state = DISABLED)
+
+
+	def setRamValue(self, value, memAddress):
+		if(memAddress == 0):
+			ramModelVector[0] = value
+			self.memAddress000.config(state = NORMAL)
+			self.memAddress000.delete("1.0", END)
+			self.memAddress000.insert(END, ramModelVector[0])
+			self.memAddress000.config(state = DISABLED)
+
+		elif(memAddress == 1):
+			ramModelVector[1] = value
+			self.memAddress001.config(state = NORMAL)
+			self.memAddress001.delete("1.0", END)
+			self.memAddress001.insert(END, ramModelVector[1])
+			self.memAddress001.config(state = DISABLED)
+
+		elif(memAddress == 2):
+			ramModelVector[2] = value
+			self.memAddress010.config(state = NORMAL)
+			self.memAddress010.delete("1.0", END)
+			self.memAddress010.insert(END, ramModelVector[2])
+			self.memAddress010.config(state = DISABLED)
+
+		elif(memAddress == 3):
+			ramModelVector[3] = value
+			self.memAddress011.config(state = NORMAL)
+			self.memAddress011.delete("1.0", END)
+			self.memAddress011.insert(END, ramModelVector[3])
+			self.memAddress011.config(state = DISABLED)
+
+		elif(memAddress == 4):
+			ramModelVector[4] = value
+			self.memAddress100.config(state = NORMAL)
+			self.memAddress100.delete("1.0", END)
+			self.memAddress100.insert(END, ramModelVector[4])
+			self.memAddress100.config(state = DISABLED)
+			
+		elif(memAddress == 5):
+			ramModelVector[5] = value
+			self.memAddress101.config(state = NORMAL)
+			self.memAddress101.delete("1.0", END)
+			self.memAddress101.insert(END, ramModelVector[5])
+			self.memAddress101.config(state = DISABLED)
+			
+		elif(memAddress == 6):
+			ramModelVector[6] = value
+			self.memAddress110.config(state = NORMAL)
+			self.memAddress110.delete("1.0", END)
+			self.memAddress110.insert(END, ramModelVector[6])
+			self.memAddress110.config(state = DISABLED)
+			
+		elif(memAddress == 7):
+			ramModelVector[7] = value
+			self.memAddress111.config(state = NORMAL)
+			self.memAddress111.delete("1.0", END)
+			self.memAddress111.insert(END, ramModelVector[7])
+			self.memAddress111.config(state = DISABLED)
+
+
+	def updateRamValue(self):
+		self.memAddress000.config(state = NORMAL)
+		self.memAddress000.delete("1.0", END)
+		self.memAddress000.insert(END, ramModelVector[0])
+		self.memAddress000.config(state = DISABLED)
+
+		self.memAddress001.config(state = NORMAL)
+		self.memAddress001.delete("1.0", END)
+		self.memAddress001.insert(END, ramModelVector[1])
+		self.memAddress001.config(state = DISABLED)
+
+		self.memAddress010.config(state = NORMAL)
+		self.memAddress010.delete("1.0", END)
+		self.memAddress010.insert(END, ramModelVector[2])
+		self.memAddress010.config(state = DISABLED)
+
+		self.memAddress011.config(state = NORMAL)
+		self.memAddress011.delete("1.0", END)
+		self.memAddress011.insert(END, ramModelVector[3])
+		self.memAddress011.config(state = DISABLED)
+
+		self.memAddress100.config(state = NORMAL)
+		self.memAddress100.delete("1.0", END)
+		self.memAddress100.insert(END, ramModelVector[4])
+		self.memAddress100.config(state = DISABLED)
+			
+		self.memAddress101.config(state = NORMAL)
+		self.memAddress101.delete("1.0", END)
+		self.memAddress101.insert(END, ramModelVector[5])
+		self.memAddress101.config(state = DISABLED)
+			
+		self.memAddress110.config(state = NORMAL)
+		self.memAddress110.delete("1.0", END)
+		self.memAddress110.insert(END, ramModelVector[6])
+		self.memAddress110.config(state = DISABLED)
+			
+		self.memAddress111.config(state = NORMAL)
+		self.memAddress111.delete("1.0", END)
+		self.memAddress111.insert(END, ramModelVector[7])
 		self.memAddress111.config(state = DISABLED)
