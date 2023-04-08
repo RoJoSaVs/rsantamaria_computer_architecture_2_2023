@@ -22,6 +22,7 @@ class CPU():
 
 	def MOESI(self, instruction, memAddress, value):
 		listCachesWithAddress = self.getCacheWithAddress(memAddress)
+
 		if(instruction == "READ"):
 			if(listCachesWithAddress == []):
 				self.updateCacheStatus(memAddress, "E", ramModelVector[memAddress])
@@ -31,8 +32,8 @@ class CPU():
 				for cache in listCachesWithAddress:
 					# https://developer.arm.com/documentation/den0013/d/Multi-core-processors/Cache-coherency/MESI-and-MOESI-protocols
 					if(cache.getStatus() == "M"): # Cache => O  Cache' => S
-						ramModelVector[int('0b' + cache.getAddress(), 2)] = cache.getValue() # Write to RAM
-						self.ram.updateRamValue()
+						# ramModelVector[int('0b' + cache.getAddress(), 2)] = cache.getValue() # Write to RAM
+						# self.ram.updateRamValue()
 						cache.setStatus("O")
 						self.updateCacheStatus(memAddress, "S", cache.getValue())
 
@@ -85,6 +86,9 @@ class CPU():
 					self.lastCache[0] = 1
 
 			if(self.lastCache[0] == 1): # Modify set 0 0
+				if((cacheModelMatrix[self.cpuId][0].getStatus() == "M") or (cacheModelMatrix[self.cpuId][0].getStatus() == "O")):
+					ramModelVector[address] = cacheModelMatrix[self.cpuId][0].getValue() # Write to RAM
+					self.ram.updateRamValue()
 				cacheModelMatrix[self.cpuId][0].setValue(value)
 				cacheModelMatrix[self.cpuId][0].setStatus(status)
 				cacheModelMatrix[self.cpuId][0].setAddress((bin(address)[2::]).zfill(3))
@@ -92,6 +96,9 @@ class CPU():
 				self.lastCache[0] = 0
 
 			else: # Modify set 0 1
+				if((cacheModelMatrix[self.cpuId][1].getStatus() == "M") or (cacheModelMatrix[self.cpuId][1].getStatus() == "O")):
+					ramModelVector[address] = cacheModelMatrix[self.cpuId][1].getValue() # Write to RAM
+					self.ram.updateRamValue()
 				cacheModelMatrix[self.cpuId][1].setValue(value)
 				cacheModelMatrix[self.cpuId][1].setStatus(status)
 				cacheModelMatrix[self.cpuId][1].setAddress((bin(address)[2::]).zfill(3))
@@ -108,6 +115,9 @@ class CPU():
 					self.lastCache[1] = 1
 
 			if(self.lastCache[1] == 1): # Modify set 1 0
+				if((cacheModelMatrix[self.cpuId][2].getStatus() == "M") or (cacheModelMatrix[self.cpuId][2].getStatus() == "O")):
+					ramModelVector[address] = cacheModelMatrix[self.cpuId][2].getValue() # Write to RAM
+					self.ram.updateRamValue()
 				cacheModelMatrix[self.cpuId][2].setValue(value)
 				cacheModelMatrix[self.cpuId][2].setStatus(status)
 				cacheModelMatrix[self.cpuId][2].setAddress((bin(address)[2::]).zfill(3))
@@ -115,6 +125,9 @@ class CPU():
 				self.lastCache[1] = 0
 
 			else: # Modify set 1 1
+				if((cacheModelMatrix[self.cpuId][3].getStatus() == "M") or (cacheModelMatrix[self.cpuId][3].getStatus() == "O")):
+					ramModelVector[address] = cacheModelMatrix[self.cpuId][3].getValue() # Write to RAM
+					self.ram.updateRamValue()
 				cacheModelMatrix[self.cpuId][3].setValue(value)
 				cacheModelMatrix[self.cpuId][3].setStatus(status)
 				cacheModelMatrix[self.cpuId][3].setAddress((bin(address)[2::]).zfill(3))
